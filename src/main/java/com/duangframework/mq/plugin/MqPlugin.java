@@ -1,5 +1,9 @@
 package com.duangframework.mq.plugin;
 
+import com.duangframework.mq.core.IMqClient;
+import com.duangframework.mq.core.MqConnection;
+import com.duangframework.mq.core.MqFactory;
+import com.duangframework.mq.emq.EmqClient;
 import com.duangframework.mvc.plugin.IPlugin;
 
 /**
@@ -7,9 +11,15 @@ import com.duangframework.mvc.plugin.IPlugin;
  */
 public class MqPlugin implements IPlugin {
 
+    private MqConnection conn;
+    public MqPlugin(MqConnection c) {
+       this.conn = c;
+    }
+
     @Override
     public void start() throws Exception {
-
+        IMqClient mqClient = new EmqClient(conn);
+        MqFactory.setClient(mqClient.getClass().getName(), mqClient);
     }
 
     @Override
