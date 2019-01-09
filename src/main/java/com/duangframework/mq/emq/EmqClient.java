@@ -11,6 +11,8 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
@@ -19,6 +21,8 @@ import java.util.Set;
  */
 
 public class EmqClient implements IMqClient {
+
+    private static final Logger logger = LoggerFactory.getLogger(EmqClient.class);
 
     private MqttClient mqttClient;
     private MqttConnectOptions connOpts;
@@ -39,7 +43,7 @@ public class EmqClient implements IMqClient {
             connOpts.setUserName(userName);
             connOpts.setPassword(password.toCharArray());
             mqttClient.connect(connOpts);
-            System.out.println("connecting to broker: "+broker + " is success!");
+            logger.warn("connecting to broker: "+broker + " is success!");
         } catch (Exception e) {
             throw new MvcException("start up mqtt server fail: " + e.getMessage(), e);
         }
@@ -56,7 +60,7 @@ public class EmqClient implements IMqClient {
         mqttMessage.setQos(messageDto.getQos());
         try {
             mqttClient.publish(messageDto.getTopic(), mqttMessage);
-            System.out.println("publish ["+messageDto.getTopic()+"] to mqtt server is success!");
+            logger.warn("sucessfully published message "+mqttMessage.getPayload()+" to topic "+ messageDto.getTopic()+" (QoS "+ messageDto.getQos()+")");
         } catch (Exception e) {
             throw new MvcException("publish ["+messageDto.getTopic()+"] to mqtt server is fail: " + e.getMessage(), e);
         }
@@ -71,6 +75,7 @@ public class EmqClient implements IMqClient {
         connOpts.setCleanSession(true);
         try {
             mqttClient.subscribe(listener.getTopic(), listener);
+            logger.warn("sucessfully subscribe topic " + listener.getTopic());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -84,6 +89,4 @@ public class EmqClient implements IMqClient {
         }
         return MqUtils.getAllTopic(url, MqUtils.createBaseAuthHeaderString(connOpts.getUserName(), new String(connOpts.getPassword())));
     }
-
-
 }
