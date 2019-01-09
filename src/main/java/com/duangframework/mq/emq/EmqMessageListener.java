@@ -11,6 +11,6 @@ public class EmqMessageListener extends AbstractMqListener {
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
-        System.out.println("##########:" + new String(message.getPayload(), "UTF-8"));
+        System.out.println(topic + "     ##########:" + new String(message.getPayload(), "UTF-8"));
     }
 }

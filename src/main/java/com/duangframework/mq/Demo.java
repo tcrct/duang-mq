@@ -34,12 +34,12 @@ public class Demo {
             e.printStackTrace();
         }
         publish(topic, message);
-//        try {
-//            Thread.sleep(2000);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        subscribe(topic);
+        try {
+            Thread.sleep(2000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        subscribe(topic);
         getAllTopic();
     }
 
