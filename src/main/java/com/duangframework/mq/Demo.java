@@ -33,25 +33,32 @@ public class Demo {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        // 发布
         publish(topic, message);
         try {
+            // 暂停2秒
             Thread.sleep(2000);
+
+            Set<String> topicSet = getAllTopic();
+            if(ToolsKit.isNotEmpty(topicSet)) {
+                // 订阅
+                subscribe(topicSet.toArray(new String[]{}));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        subscribe(topic);
-        getAllTopic();
     }
 
     private static void publish(String topic, String message) {
         MqFactory.getDefaultClient().publish(new MqMessage(topic, message));
     }
-    private static void subscribe(String topic){
-        MqFactory.getDefaultClient().subscribe(new EmqMessageListener(topic));
+    private static void subscribe(String... topics){
+        for(String topic : topics) {
+            MqFactory.getDefaultClient().subscribe(new EmqMessageListener(topic));
+        }
     }
 
-    private static void getAllTopic(){
-        Set<String> set = MqFactory.getDefaultClient().getAllTopic();
-        System.out.println("getAllTopic: " + ToolsKit.toJsonString(set));
+    private static  Set<String> getAllTopic(){
+        return MqFactory.getDefaultClient().getAllTopic();
     }
 }
