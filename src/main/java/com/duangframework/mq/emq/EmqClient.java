@@ -60,7 +60,7 @@ public class EmqClient implements IMqClient {
         mqttMessage.setQos(messageDto.getQos());
         try {
             mqttClient.publish(messageDto.getTopic(), mqttMessage);
-            logger.warn("sucessfully published message "+mqttMessage.getPayload()+" to topic "+ messageDto.getTopic()+" (QoS "+ messageDto.getQos()+")");
+            logger.warn("sucessfully published message: "+new String(mqttMessage.getPayload())+" to topic: "+ messageDto.getTopic()+" (QoS "+ messageDto.getQos()+")");
         } catch (Exception e) {
             throw new MvcException("publish ["+messageDto.getTopic()+"] to mqtt server is fail: " + e.getMessage(), e);
         }
@@ -75,7 +75,7 @@ public class EmqClient implements IMqClient {
         connOpts.setCleanSession(true);
         try {
             mqttClient.subscribe(listener.getTopic(), listener);
-            logger.warn("sucessfully subscribe topic " + listener.getTopic());
+            logger.warn("sucessfully subscribe topic: " + listener.getTopic());
         } catch (Exception e) {
             e.printStackTrace();
         }
