@@ -14,6 +14,7 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -27,6 +28,8 @@ public class EmqClient implements IMqClient {
     private MqttClient mqttClient;
     private MqttConnectOptions connOpts;
     private MqConnection conn;
+    private Set<String> subscribeTopicSet;
+    private Set<String> publishTopicSet;
 
     public EmqClient(MqConnection conn) {
         this(conn.getBroker(), conn.getClientId(), conn.getAccount(), conn.getPassword());
@@ -43,6 +46,8 @@ public class EmqClient implements IMqClient {
             connOpts.setUserName(userName);
             connOpts.setPassword(password.toCharArray());
             mqttClient.connect(connOpts);
+            subscribeTopicSet = new HashSet<>();
+            publishTopicSet = new HashSet<>();
             logger.warn("connecting to broker: "+broker + " is success!");
         } catch (Exception e) {
             throw new MvcException("start up mqtt server fail: " + e.getMessage(), e);
@@ -55,13 +60,20 @@ public class EmqClient implements IMqClient {
         if(ToolsKit.isEmpty(mqttClient)) {
             throw new NullPointerException("mqttClient is null");
         }
+        String topic = messageDto.getTopic();
+        if(publishTopicSet.contains(topic)){
+            logger.warn("topic: " + topic + " is exist, exit publish");
+            return;
+        }
         connOpts.setCleanSession(true);
         MqttMessage mqttMessage = new MqttMessage(messageDto.getMessage().getBytes());
         mqttMessage.setQos(messageDto.getQos());
         try {
-            mqttClient.publish(messageDto.getTopic(), mqttMessage);
-            logger.warn("sucessfully published message: "+new String(mqttMessage.getPayload())+" to topic: "+ messageDto.getTopic()+" (QoS "+ messageDto.getQos()+")");
+            mqttClient.publish(topic, mqttMessage);
+            publishTopicSet.add(topic);
+            logger.warn("sucessfully published message: "+new String(mqttMessage.getPayload())+" to topic: "+ topic+" (QoS "+ messageDto.getQos()+")");
         } catch (Exception e) {
+            publishTopicSet.remove(topic);
             throw new MvcException("publish ["+messageDto.getTopic()+"] to mqtt server is fail: " + e.getMessage(), e);
         }
     }
@@ -71,13 +83,31 @@ public class EmqClient implements IMqClient {
         if (ToolsKit.isEmpty(mqttClient)) {
             throw new NullPointerException("mqttClient is null");
         }
-        System.out.println(mqttClient.getServerURI());
+        String topic = listener.getTopic();
+        if(subscribeTopicSet.contains(topic)){
+            logger.warn("topic: " + topic + " is exist, exit subscribe");
+            return;
+        }
         connOpts.setCleanSession(true);
         try {
-            mqttClient.subscribe(listener.getTopic(), listener);
-            logger.warn("sucessfully subscribe topic: " + listener.getTopic());
+            mqttClient.subscribe(topic, listener);
+            subscribeTopicSet.add(topic);
+            logger.warn("sucessfully subscribe topic: " + topic);
         } catch (Exception e) {
-            e.printStackTrace();
+            subscribeTopicSet.remove(topic);
+            throw new MvcException("subscribe ["+topic+"] to mqtt server is fail: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void unsubscribe(String topic) {
+        try {
+            mqttClient.unsubscribe(topic);
+            logger.warn("sucessfully unsubscribe topic: " + topic);
+        } catch (Exception e) {
+            throw new MvcException("unsubscribe ["+topic+"] to mqtt server is fail: " + e.getMessage(), e);
+        } finally {
+            subscribeTopicSet.remove(topic);
         }
     }
 

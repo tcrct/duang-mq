@@ -2,14 +2,9 @@ package com.duangframework.mq;
 
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mq.core.*;
-import com.duangframework.mq.emq.EmqMessageListener;
+import com.duangframework.mq.emq.DemoEmqMessageListener;
 import com.duangframework.mq.plugin.MqPlugin;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-import sun.plugin2.jvm.RemoteJVMLauncher;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 public class Demo {
@@ -18,7 +13,9 @@ public class Demo {
         String message = "这是一封迟来的告白！！test!@456思格特distributionManagement";
         String account = "admin";
         String password = "public";
-        String clientId = "signet-mqtt-java";
+        // 必须要唯一，如果有重复ID的话，会导致抛出客户机没连接异常
+        // https://www.ibm.com/support/knowledgecenter/zh/SSFKSJ_7.5.0/com.ibm.mm.tc.doc/tc80300_.htm
+        String clientId = "signet-mqtt-java-laotang";
         String broker = "tcp://192.168.100.100:1883";
         MqPlugin plugin = new MqPlugin(new MqConnection.Builder()
                 .account(account)
@@ -36,14 +33,17 @@ public class Demo {
         // 发布
         publish(topic, message);
         try {
+            Set<String> topicSet = getAllTopic();
             // 暂停2秒
             Thread.sleep(2000);
-
-            Set<String> topicSet = getAllTopic();
             if(ToolsKit.isNotEmpty(topicSet)) {
                 // 订阅
                 subscribe(topicSet.toArray(new String[]{}));
+                subscribe(topicSet.toArray(new String[]{}));
             }
+            Thread.sleep(10000); //10秒后，重新订阅
+            System.out.println("####################");
+            subscribe(topic);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -54,7 +54,7 @@ public class Demo {
     }
     private static void subscribe(String... topics){
         for(String topic : topics) {
-            MqFactory.getDefaultClient().subscribe(new EmqMessageListener(topic));
+            MqFactory.getDefaultClient().subscribe(new DemoEmqMessageListener(topic, ""));
         }
     }
 

@@ -21,6 +21,12 @@ public interface IMqClient {
     void subscribe(IMessageListener listener);
 
     /**
+     * 取消订阅
+     * @param topic
+     */
+    void unsubscribe(String topic);
+
+    /**
      * 取得所有订阅主题
      */
     Set<String> getAllTopic();

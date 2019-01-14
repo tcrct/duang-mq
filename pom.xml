@@ -9,11 +9,13 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>duang-mq</name>
-    <!-- FIXME change it to the project's website -->
-    <url>http://www.example.com</url>
+    <url>http://www.duangframework.com</url>
 
     <distributionManagement>
+        <!--<repository>-->
+            <!--<id>Eclipse Paho Repo</id>-->
+            <!--<url>https://repo.eclipse.org/content/repositories/paho-releases/</url>-->
+        <!--</repository>-->
         <repository>
             <id>nexus</id>
             <name>Releases</name>
@@ -24,10 +26,6 @@
             <name>Snapshot</name>
             <url>http://192.168.100.100:7071/repository/maven-snapshots/</url>
         </snapshotRepository>
-        <repository>
-            <id>Eclipse Paho Repo</id>
-            <url>https://repo.eclipse.org/content/repositories/paho-releases/</url>
-        </repository>
     </distributionManagement>
 
     <build>
