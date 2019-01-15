@@ -52,15 +52,20 @@ public class Demo {
     }
     private static void subscribe(String... topics){
         for(String topic : topics) {
-            MqResult result = new MqResult();
-            result = MqFactory.getDefaultClient().subscribe(topic, result);
-            if(result.isComplete()) {
-                try {
-                    System.out.println(result.getTopic() + "  ########  " + result.getMessageId()+ " ########: " + result.getBodyString());
-                } catch (Exception e) {
-                    e.printStackTrace();
+            IMqCallback<MqResult> callback = new IMqCallback<MqResult>(){
+                @Override
+                public void callback(MqResult result) {
+                    if(result.isComplete()) {
+                        try {
+                            System.out.println(result.getTopic() + "  ########  " + result.getMessageId()+ " ########: " + result.getBodyString());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
-            }
+            };
+            MqFactory.getDefaultClient().subscribe(topic, callback);
+
         }
     }
 

@@ -68,7 +68,7 @@ public class EmqClient implements IMqClient {
     }
 
     @Override
-    public MqResult subscribe(final String topic, final MqResult result) {
+    public MqResult subscribe(final String topic, final IMqCallback<MqResult> callback) {
         if (ToolsKit.isEmpty(mqttClient)) {
             throw new NullPointerException("mqttClient is null");
         }
@@ -77,7 +77,7 @@ public class EmqClient implements IMqClient {
             return null;
         }
         connOpts.setCleanSession(true);
-//        final MqResult result = new MqResult();
+        final MqResult result = new MqResult();
         try {
             mqttClient.subscribe(topic, new IMqttMessageListener() {
                 @Override
@@ -86,6 +86,7 @@ public class EmqClient implements IMqClient {
                     result.setMessageId(message.getId()+"");
                     result.setQos(message.getQos());
                     result.setTopic(topic);
+                    callback.callback(result);
                     logger.warn("subscribe topic: " + topic+"            "+result.toString());
                 }
             });
