@@ -2,10 +2,8 @@ package com.duangframework.mq.core;
 
 import com.duangframework.kit.ToolsKit;
 import com.duangframework.mvc.http.enums.ConstEnums;
-import com.duangframework.sdk.constant.Constant;
 
 import java.nio.charset.Charset;
-import java.util.Arrays;
 
 public class MqResult implements java.io.Serializable {
 
