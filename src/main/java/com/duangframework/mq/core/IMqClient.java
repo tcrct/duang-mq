@@ -1,5 +1,7 @@
 package com.duangframework.mq.core;
 
+import org.eclipse.paho.client.mqttv3.IMqttToken;
+
 import java.util.List;
 import java.util.Set;
 
@@ -18,7 +20,7 @@ public interface IMqClient {
     /**
      * 订阅
      */
-    void subscribe(IMessageListener listener);
+    MqResult subscribe(String topic, MqResult mqResult);
 
     /**
      * 取消订阅
@@ -30,6 +32,11 @@ public interface IMqClient {
      * 取得所有订阅主题
      */
     Set<String> getAllTopic();
+
+    /**
+     * 断开链接
+     */
+    void disconnect();
 
 
 }

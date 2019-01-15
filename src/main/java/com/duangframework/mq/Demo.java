@@ -1,8 +1,6 @@
 package com.duangframework.mq;
 
-import com.duangframework.kit.ToolsKit;
 import com.duangframework.mq.core.*;
-import com.duangframework.mq.emq.DemoEmqMessageListener;
 import com.duangframework.mq.plugin.MqPlugin;
 
 import java.util.Set;
@@ -33,17 +31,17 @@ public class Demo {
         // 发布
         publish(topic, message);
         try {
-            Set<String> topicSet = getAllTopic();
-            // 暂停2秒
-            Thread.sleep(2000);
-            if(ToolsKit.isNotEmpty(topicSet)) {
-                // 订阅
-                subscribe(topicSet.toArray(new String[]{}));
-                subscribe(topicSet.toArray(new String[]{}));
-            }
-            Thread.sleep(10000); //10秒后，重新订阅
-            System.out.println("####################");
-            subscribe(topic);
+//            Set<String> topicSet = getAllTopic();
+//            // 暂停2秒
+//            Thread.sleep(2000);
+//            if(ToolsKit.isNotEmpty(topicSet)) {
+//                // 订阅
+//                subscribe(topicSet.toArray(new String[]{}));
+//                subscribe(topicSet.toArray(new String[]{}));
+//            }
+//            Thread.sleep(10000); //10秒后，重新订阅
+//            System.out.println("####################");
+                subscribe(topic);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -54,7 +52,15 @@ public class Demo {
     }
     private static void subscribe(String... topics){
         for(String topic : topics) {
-            MqFactory.getDefaultClient().subscribe(new DemoEmqMessageListener(topic, ""));
+            MqResult result = new MqResult();
+            result = MqFactory.getDefaultClient().subscribe(topic, result);
+            if(result.isComplete()) {
+                try {
+                    System.out.println(result.getTopic() + "  ########  " + result.getMessageId()+ " ########: " + result.getBodyString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
