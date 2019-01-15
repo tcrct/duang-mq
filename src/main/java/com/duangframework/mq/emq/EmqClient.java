@@ -68,20 +68,20 @@ public class EmqClient implements IMqClient {
     }
 
     @Override
-    public MqResult subscribe(final String topic, final IMqCallback<MqResult> callback) {
+    public void subscribe(final String topic, final IMqCallback<MqResult> callback) {
         if (ToolsKit.isEmpty(mqttClient)) {
             throw new NullPointerException("mqttClient is null");
         }
         if(subscribeTopicSet.contains(topic)){
             logger.warn("topic: " + topic + " is exist, exit subscribe");
-            return null;
+            return;
         }
         connOpts.setCleanSession(true);
-        final MqResult result = new MqResult();
         try {
             mqttClient.subscribe(topic, new IMqttMessageListener() {
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
+                    MqResult result = new MqResult();
                     result.setBody(message.getPayload());
                     result.setMessageId(message.getId()+"");
                     result.setQos(message.getQos());
@@ -92,7 +92,6 @@ public class EmqClient implements IMqClient {
             });
             subscribeTopicSet.add(topic);
             logger.warn("sucessfully subscribe topic: " + topic);
-            return result;
         } catch (Exception e) {
             subscribeTopicSet.remove(topic);
             throw new MvcException("subscribe ["+topic+"] to mqtt server is fail: " + e.getMessage(), e);
@@ -116,8 +115,8 @@ public class EmqClient implements IMqClient {
         String clientId = mqttClient.getClientId();
         try {
             mqttClient.disconnect();
-            logger.warn("sucessfully disconnect clientId: " + clientId);
             subscribeTopicSet.clear();
+            logger.warn("sucessfully disconnect clientId: " + clientId);
         } catch (Exception e) {
             throw new MvcException("disconnect ["+clientId+"] to mqtt server is fail: " + e.getMessage(), e);
         }

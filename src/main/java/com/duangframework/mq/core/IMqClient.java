@@ -20,7 +20,7 @@ public interface IMqClient {
     /**
      * 订阅
      */
-    MqResult subscribe(String topic, IMqCallback<MqResult> mqCallback);
+    void subscribe(String topic, IMqCallback<MqResult> mqCallback);
 
     /**
      * 取消订阅

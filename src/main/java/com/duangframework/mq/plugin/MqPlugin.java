@@ -24,6 +24,6 @@ public class MqPlugin implements IPlugin {
 
     @Override
     public void stop() throws Exception {
-
+        MqFactory.getDefaultClient().disconnect();
     }
 }
