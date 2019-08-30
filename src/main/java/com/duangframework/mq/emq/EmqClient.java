@@ -36,9 +36,11 @@ public class EmqClient implements IMqClient {
             mqttClient = new MqttClient(broker, clientId, persistence);
             connOpts = new MqttConnectOptions();
             connOpts.setAutomaticReconnect(true);
+//            connOpts.setMqttVersion(4);
             connOpts.setCleanSession(true);
             connOpts.setUserName(userName);
             connOpts.setPassword(password.toCharArray());
+            mqttClient.setTimeToWait(5000);
             mqttClient.connect(connOpts);
 //            subscribeTopicSet = new HashSet<>();
             logger.warn("connecting to broker: "+broker + " is success!");
